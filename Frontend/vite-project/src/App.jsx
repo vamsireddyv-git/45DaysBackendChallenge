@@ -35,6 +35,7 @@ function App() {
       const token = response.data.accessToken;
 
       localStorage.setItem("accessToken",token);
+      setScreen(2)
     }
     catch(error){
     console.log(error.message);
@@ -65,7 +66,7 @@ function App() {
       <input type="text" placeholder='xavier' onChange={(e) => setName(e.target.value)}/><br/>
        <input type="email" placeholder='example@gamil.com' onChange={(e) => setEmail(e.target.value)}/><br/>
       <input type="password" placeholder='xxxxxxxx' onChange={(e) => setPassword(e.target.value)}/><br/>
-      <button type='submit'>Submit</button>
+      <button type='submit'>Register</button>
      </form>
       </>)}
 
@@ -74,7 +75,7 @@ function App() {
       <form onSubmit={(e) => handleLogin(e)}>
       <input type="email" placeholder='example@gamil.com' onChange={(e) => setEmail(e.target.value)}/><br/>
       <input type="password" placeholder='xxxxxxxx' onChange={(e) => setPassword(e.target.value)}/><br/>
-      <button type='submit'>Submit</button>
+      <button type='submit'>Login</button>
       </form>
       </>)}  
 
@@ -85,7 +86,6 @@ function App() {
 
       {screen == 1 && <button onClick={() => setScreen(0)}>Go to Register</button>}
       {screen == 0 && <button onClick={() => setScreen(1)}>Go to Login</button>}
-      <button onClick={() => setScreen(2)}>Go to Profile</button>
     </div>
     </>
   )

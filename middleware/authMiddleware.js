@@ -6,6 +6,7 @@ export const verifyToken = async (req, res , next) => {
         if(!accessToken){
             return res.status(401).json({
                 success : false,
+                code : "ACCESS_TOKEN_MISSING",
                 message : "Access token missing"
             })
         }
@@ -15,8 +16,15 @@ export const verifyToken = async (req, res , next) => {
         req.user = decoded;
         next();
     }catch(error){
+        if(error.name === "TokenExpiredError"){
+            return res.status(401).json({
+                code : "ACCESS_TOKEN_EXPIRED",
+                message : "access token expired"
+            })
+        }
         return res.status(401).json({
-            message : " Invalid or expired token"
+            code : "INVALID_ACCESS_TOKEN",
+            message  : "Invalid Access Token"
         })
     }
 }

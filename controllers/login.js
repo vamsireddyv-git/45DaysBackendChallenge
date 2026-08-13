@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
+import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
 
 
 export const loginUser = async (req , res) => {
@@ -31,11 +32,15 @@ export const loginUser = async (req , res) => {
             })
         }
 
-        const accessToken = await jwt.sign(
-            { userId : user._id },
-             process.env.JWT_SECRET,
-            {expiresIn : "7d"}
-        )
+        const accessToken = generateAccessToken(user._id.toString())
+        const refreshToken = generateRefreshToken(user._id.toString())
+
+        res.cookie("refreshToken",refreshToken,{
+            httpOnly : true,
+            secure : process.env.NODE_ENV === "production",
+            sameSite : "lax",
+            maxAge : 7 * 24 * 60 * 60 * 1000
+        });
 
         res.json({
             message : "Login successful",

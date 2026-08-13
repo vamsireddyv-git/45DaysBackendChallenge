@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import axios from 'axios';
+import api from './axios.js';
 
 function App() {
   const[name , setName] = useState("");
@@ -16,11 +16,10 @@ function App() {
         return;
       }
 
-      const response = await axios.post("http://localhost:5000/user/register",{name , email, password})
-      console.log(response.data)
+      const response = await api.post("/user/register",{name , email, password})
     }
     catch(error){
-    console.log(error.message);
+    return;
   }
   }
 
@@ -31,27 +30,26 @@ function App() {
         return;
       }
 
-      const response = await axios.post("http://localhost:5000/user/login",{email, password})
+      const response = await api.post("/user/login",{email, password},{withCredentials : true})
       const token = response.data.accessToken;
 
       localStorage.setItem("accessToken",token);
       setScreen(2)
     }
     catch(error){
-    console.log(error.message);
+      return;
   }
   }
 
   const getProfile = async () => {
     try{
       const accessToken = localStorage.getItem("accessToken")
-      const response = await axios.get("http://localhost:5000/user/profile",{headers : {Authorization : `Bearer ${accessToken}`}})
-      console.log(response)
+      const response = await api.get("/user/profile",{headers : {Authorization : `Bearer ${accessToken}`}})
 
       setMessage(response.data.userId)
     }
     catch(error){
-    console.log(error.message);
+      return;
   }
   }
 
@@ -76,6 +74,8 @@ function App() {
       <input type="email" placeholder='example@gamil.com' onChange={(e) => setEmail(e.target.value)}/><br/>
       <input type="password" placeholder='xxxxxxxx' onChange={(e) => setPassword(e.target.value)}/><br/>
       <button type='submit'>Login</button>
+      {message && <p>{message}</p>}<br/>
+      <button onClick={() => getProfile()}>Get Profile</button>
       </form>
       </>)}  
 

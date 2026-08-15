@@ -10,15 +10,21 @@ api.interceptors.response.use(
         return response
     },
     async (error) => {
-        if(error.response?.status === 401 && error.response?.data?.code === "ACCESS_TOKEN_EXPIRED"){
-            const response = await api.post("/auth/refresh");
-            const newAccessToken = response.data.accessToken;
-            localStorage.setItem("accessToken",newAccessToken);
-            const originalRequest = error.config;
-            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-            return api(originalRequest);
+        const originalRequest = error.config;
+        if(error.response?.data.status === 401 && !originalRequest._retry){
+            originalRequest._retry = true;
+            try{
+                const response = await api.post("/auth/refresh",{},{withCredentials : true});
+
+                const newAccessToken = response.data.accessToken;
+                localStorage.setItem("accessToken",newAccessToken);
+                originalRequest.header.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest)
+            }catch(refreshError){
+                localStorage.removeItem("accessToken")
+                return Promise.reject(error)                
+            }
         }
-        return Promise.reject(error)
     }
 )
 

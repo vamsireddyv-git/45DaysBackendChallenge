@@ -30,10 +30,12 @@ function App() {
         return;
       }
 
-      const response = await api.post("/user/login",{email, password},{withCredentials : true})
-      const token = response.data.accessToken;
+      const response = await api.post("/user/login",{email, password},{withCredentials : true,})
+      const accessToken = response.data.accessToken;
+      const csrfToken = response.data.csrfToken;
 
-      localStorage.setItem("accessToken",token);
+      localStorage.setItem("accessToken",accessToken);
+      localStorage.setItem("csrfToken",csrfToken);
       setScreen(2)
     }
     catch(error){
@@ -44,7 +46,10 @@ function App() {
   const getProfile = async () => {
     try{
       const accessToken = localStorage.getItem("accessToken")
-      const response = await api.get("/user/profile",{headers : {Authorization : `Bearer ${accessToken}`}})
+      const response = await api.get("/user/profile",{headers : 
+        {Authorization : `Bearer ${accessToken}`}
+        
+      })
 
       setMessage(response.data.userId)
     }
@@ -52,6 +57,19 @@ function App() {
       return;
   }
   }
+
+  const handleLogout = async () => {
+    try{
+      const response = await api.post("/auth/logout");
+      setMessage(response.data.message)
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("csrfToken");
+    }
+    catch(error){
+
+  }
+  }
+  
 
 
 
@@ -82,6 +100,7 @@ function App() {
       {screen == 2 && (<>
       {message && <p>{message}</p>}<br/>
       <button onClick={() => getProfile()}>Get Profile</button>
+      <button onClick={() => handleLogout()}>Logout</button>
       </>)}
 
       {screen == 1 && <button onClick={() => setScreen(0)}>Go to Register</button>}

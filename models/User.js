@@ -13,6 +13,16 @@ const userSchema = new mongoose.Schema({
 
     password : {
         type : String,
+    },
+
+    refreshHash:{
+        type : String,
+        default : null
+    },
+
+    csrfTokenHash : {
+        type : String,
+        default : null
     }
 })
 
